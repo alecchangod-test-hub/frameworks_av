@@ -320,7 +320,9 @@ void CameraFuzzer::invokeCameraAPIs() {
 
         rc = mCameraService->connect(this, cameraId, String16(),
                 android::CameraService::USE_CALLING_UID, android::CameraService::USE_CALLING_PID,
-                /*targetSdkVersion*/__ANDROID_API_FUTURE__, &cameraDevice);
+                /*targetSdkVersion*/__ANDROID_API_FUTURE__, /*overrideToPortrait*/true,
+                /*forceSlowJpegMode*/false,
+                &cameraDevice);
         if (!rc.isOk()) {
             // camera not connected
             return;

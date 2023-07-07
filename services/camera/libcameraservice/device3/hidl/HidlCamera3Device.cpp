@@ -165,7 +165,8 @@ status_t HidlCamera3Device::initialize(sp<CameraProviderManager> manager,
         return res;
     }
 
-    res = manager->getCameraCharacteristics(mId.string(), mOverrideForPerfClass, &mDeviceInfo);
+    res = manager->getCameraCharacteristics(mId.string(), mOverrideForPerfClass, &mDeviceInfo,
+            /*overrideToPortrait*/false);
     if (res != OK) {
         SET_ERR_L("Could not retrieve camera characteristics: %s (%d)", strerror(-res), res);
         session->close();
@@ -179,7 +180,8 @@ status_t HidlCamera3Device::initialize(sp<CameraProviderManager> manager,
         for (auto& physicalId : physicalCameraIds) {
             // Do not override characteristics for physical cameras
             res = manager->getCameraCharacteristics(
-                    physicalId, /*overrideForPerfClass*/false, &mPhysicalDeviceInfoMap[physicalId]);
+                    physicalId, /*overrideForPerfClass*/false, &mPhysicalDeviceInfoMap[physicalId],
+                    /*overrideToPortrait*/false);
             if (res != OK) {
                 CLOGW("Could not retrieve camera %s characteristics: %s (%d)",
                         physicalId.c_str(), strerror(-res), res);
@@ -375,7 +377,8 @@ hardware::Return<void> HidlCamera3Device::processCaptureResult_3_4(
         mNumPartialResults, mVendorTagId, mDeviceInfo, mPhysicalDeviceInfoMap,
         mDistortionMappers, mZoomRatioMappers, mRotateAndCropMappers,
         mTagMonitor, mInputStream, mOutputStreams, mSessionStatsBuilder, listener, *this, *this,
-        *mInterface, mLegacyClient, mMinExpectedDuration, mIsFixedFps}, mResultMetadataQueue
+        *mInterface, mLegacyClient, mMinExpectedDuration, mIsFixedFps, mOverrideToPortrait,
+        mActivePhysicalId}, mResultMetadataQueue
     };
 
     //HidlCaptureOutputStates hidlStates {
@@ -437,7 +440,8 @@ hardware::Return<void> HidlCamera3Device::processCaptureResult(
         mNumPartialResults, mVendorTagId, mDeviceInfo, mPhysicalDeviceInfoMap,
         mDistortionMappers, mZoomRatioMappers, mRotateAndCropMappers,
         mTagMonitor, mInputStream, mOutputStreams, mSessionStatsBuilder, listener, *this, *this,
-        *mInterface, mLegacyClient, mMinExpectedDuration, mIsFixedFps}, mResultMetadataQueue
+        *mInterface, mLegacyClient, mMinExpectedDuration, mIsFixedFps, mOverrideToPortrait,
+        mActivePhysicalId}, mResultMetadataQueue
     };
 
     for (const auto& result : results) {
@@ -484,7 +488,8 @@ hardware::Return<void> HidlCamera3Device::notifyHelper(
         mNumPartialResults, mVendorTagId, mDeviceInfo, mPhysicalDeviceInfoMap,
         mDistortionMappers, mZoomRatioMappers, mRotateAndCropMappers,
         mTagMonitor, mInputStream, mOutputStreams, mSessionStatsBuilder, listener, *this, *this,
-        *mInterface, mLegacyClient, mMinExpectedDuration, mIsFixedFps}, mResultMetadataQueue
+        *mInterface, mLegacyClient, mMinExpectedDuration, mIsFixedFps, mOverrideToPortrait,
+        mActivePhysicalId}, mResultMetadataQueue
     };
     for (const auto& msg : msgs) {
         camera3::notify(states, msg);

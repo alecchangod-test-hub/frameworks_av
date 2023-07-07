@@ -207,7 +207,8 @@ status_t AidlCamera3Device::initialize(sp<CameraProviderManager> manager,
         for (auto& physicalId : physicalCameraIds) {
             // Do not override characteristics for physical cameras
             res = manager->getCameraCharacteristics(
-                    physicalId, /*overrideForPerfClass*/false, &mPhysicalDeviceInfoMap[physicalId]);
+                    physicalId, /*overrideForPerfClass*/false, &mPhysicalDeviceInfoMap[physicalId],
+                    mOverrideToPortrait);
             if (res != OK) {
                 SET_ERR_L("Could not retrieve camera %s characteristics: %s (%d)",
                         physicalId.c_str(), strerror(-res), res);
@@ -372,8 +373,8 @@ status_t AidlCamera3Device::initialize(sp<CameraProviderManager> manager,
         mNumPartialResults, mVendorTagId, mDeviceInfo, mPhysicalDeviceInfoMap,
         mDistortionMappers, mZoomRatioMappers, mRotateAndCropMappers,
         mTagMonitor, mInputStream, mOutputStreams, mSessionStatsBuilder, listener, *this,
-        *this, *(mInterface), mLegacyClient, mMinExpectedDuration, mIsFixedFps},
-        mResultMetadataQueue
+        *this, *(mInterface), mLegacyClient, mMinExpectedDuration, mIsFixedFps,
+        mOverrideToPortrait, mActivePhysicalId}, mResultMetadataQueue
     };
 
     for (const auto& result : results) {
@@ -414,8 +415,8 @@ status_t AidlCamera3Device::initialize(sp<CameraProviderManager> manager,
         mNumPartialResults, mVendorTagId, mDeviceInfo, mPhysicalDeviceInfoMap,
         mDistortionMappers, mZoomRatioMappers, mRotateAndCropMappers,
         mTagMonitor, mInputStream, mOutputStreams, mSessionStatsBuilder, listener, *this,
-        *this, *(mInterface), mLegacyClient, mMinExpectedDuration, mIsFixedFps},
-        mResultMetadataQueue
+        *this, *(mInterface), mLegacyClient, mMinExpectedDuration, mIsFixedFps,
+        mOverrideToPortrait, mActivePhysicalId}, mResultMetadataQueue
     };
     for (const auto& msg : msgs) {
         camera3::notify(states, msg);
